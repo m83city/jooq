@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StudentService {
-    StudentRepository repo;
+    private final StudentRepository repo;
+
     public Student getById (Long id){
         return repo.getById(id);
     }
