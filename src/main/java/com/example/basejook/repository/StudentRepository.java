@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 import org.jooq.your.base.tables.records.StudentRecord;
+
+import java.util.Optional;
 import java.util.Random;
 
 import static org.jooq.your.base.Tables.STUDENT;
@@ -13,36 +15,58 @@ import static org.jooq.your.base.Tables.STUDENT;
 @RequiredArgsConstructor
 
 public class StudentRepository {
-    private  final DSLContext dsl;
+    private final DSLContext dsl;
 
-    public Student getById (Long id){
-        StudentRecord student = dsl
+    public Optional<Student> getById(Long id) {
+        return dsl
                 .selectFrom(STUDENT)
                 .where(STUDENT.ID.eq(id.intValue()))
-                .fetchOne();
-        return  Student.builder()
-                .id(Long.valueOf(student.getId()))
-                .name(student.getFirstname())
-                .surname(student.getSecondname())
-                .build();
+                .fetchOptionalInto(Student.class);
+    }
 
-    }
-    public Student create (Student student){
+    public Optional<Student> create(Student student) {
         Random random = new Random();
-        dsl.insertInto(STUDENT, STUDENT.ID, STUDENT.FIRSTNAME, STUDENT.SECONDNAME)
-                .values(random.nextInt(), student.getName(), student.getSurname())
-                .execute();
-        return student;
+        return dsl.insertInto(STUDENT,
+                        STUDENT.ID,
+                        STUDENT.FIRSTNAME,
+                        STUDENT.SECONDNAME,
+                        STUDENT.AGE,
+                        STUDENT.COURSE,
+                        STUDENT.LASTNAME
+                )
+                .values(random.nextInt(),
+                        student.getFirstName(),
+                        student.getSecondName(),
+                        student.getAge(),
+                        student.getCourse(),
+                        student.getLastName()
+                ).returning(STUDENT.ID,
+                        STUDENT.AGE,
+                        STUDENT.COURSE,
+                        STUDENT.FIRSTNAME,
+                        STUDENT.SECONDNAME,
+                        STUDENT.LASTNAME)
+                .fetchOptionalInto(Student.class);
     }
-    public Student update (Long id, Student student){
-        dsl.update(STUDENT)
-                .set(STUDENT.FIRSTNAME, student.getName())
-                .set(STUDENT.SECONDNAME, student.getSurname())
+
+    public Optional<Student> update(Long id, Student student) {
+       return  dsl.update(STUDENT)
+                .set(STUDENT.FIRSTNAME, student.getFirstName())
+                .set(STUDENT.SECONDNAME, student.getSecondName())
+                .set(STUDENT.LASTNAME, student.getLastName())
+                .set(STUDENT.AGE, student.getAge())
+                .set(STUDENT.COURSE, student.getCourse())
                 .where(STUDENT.ID.eq(id.intValue()))
-                .execute();
-        return student;
+                .returning(STUDENT.ID,
+                        STUDENT.AGE,
+                        STUDENT.COURSE,
+                        STUDENT.FIRSTNAME,
+                        STUDENT.SECONDNAME,
+                        STUDENT.LASTNAME)
+                .fetchOptionalInto(Student.class);
     }
-    public Long delete (Long id){
+
+    public Long delete(Long id) {
         dsl.deleteFrom(STUDENT).where(STUDENT.ID.eq(id.intValue())).execute();
         return id;
     }
