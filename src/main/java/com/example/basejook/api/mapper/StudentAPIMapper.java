@@ -8,16 +8,22 @@ public class StudentAPIMapper {
         return StudentDTO
                 .builder()
                 .id(student.getId())
-                .name(student.getName())
-                .surname(student.getSurname())
+                .firstName(student.getFirstName())
+                .secondName(student.getSecondName())
+                .age(student.getAge())
+                .course(student.getCourse())
+                .lastName(student.getLastName())
                 .build();
     }
     public  static Student asStudent (StudentDTO student) {
         return Student
                 .builder()
                 .id(student.getId())
-                .name(student.getName())
-                .surname(student.getSurname())
+                .firstName(student.getFirstName())
+                .secondName(student.getSecondName())
+                .age(student.getAge())
+                .course(student.getCourse())
+                .lastName(student.getLastName())
                 .build();
     }
 }
